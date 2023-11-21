@@ -1,4 +1,6 @@
 # :coffee: Coffee rating prediction
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://coffee-rating-prediction.streamlit.app/)
+
 The objective of this project is to be able to predict how highly rated a coffee would be on [Coffee Review](https://www.coffeereview.com/), based upon some meta-data about the selected coffee.
 
 ## Downloading the dataset
@@ -15,30 +17,34 @@ To train a linear regression model, run the following script:
 training/train.py
 ```
 
-## Predicting ratings using the model
-Build the server using the following command:
-```
+## Generating predictions using the model
+The model is served within a separate Docker container. This is hosted using [AWS Lambda](https://aws.amazon.com/lambda/).
+
+To build the server locally, run the following command:
+``` bash
 docker build server -t coffee-prediction-server:latest
 ```
 
 To start the server for the first time, use the following command:
-```
+``` bash
 docker run -it --network coffee-rating-prediction_devcontainer_default --hostname coffee_server --name coffee-prediction-server coffee-prediction-server:latest
 ```
 
 To restart the server, run the following:
-```
+``` bash
 docker start -i coffee-prediction-server
 ```
 
 Then run the following to test the server:
-```
+``` bash
 python test_predict.py
 ```
 
 ## Using the interactive dashboard
-You can generate predictions using an interactive `streamlit` dashboard. This can be launched locally by running the following command:
+To investigate the predicted rating of a given coffee, you can use the interactive `streamlit` dashboard. This is hosted on [Streamlit Cloud](https://streamlit.io/cloud).
 
-```
+You can also launch the dashboard locally by running the following command:
+
+``` bash
 streamlit run dashboard.py
 ```
