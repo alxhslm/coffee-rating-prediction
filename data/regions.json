@@ -1,0 +1,42 @@
+{
+    "South America": [
+        "Brazil",
+        "Colombia",
+        "Peru",
+        "Bolivia",
+        "Ecuador"
+    ],
+    "Central America": [
+        "Guatemala",
+        "Costa Rica",
+        "Honduras",
+        "Nicaragua",
+        "Panama",
+        "El Salvador"
+    ],
+    "Southeast Asia": [
+        "Indonesia",
+        "Laos",
+        "Papua New Guinea",
+        "Philippines",
+        "Vietnam", "Thailand"
+    ],
+    "East Africa": [
+        "Ethiopia",
+        "Kenya",
+        "Tanzania",
+        "Burundi",
+        "Uganda",
+        "Rwanda",
+        "Zambia",
+        "Zimbabwe",
+        "Malawi",
+        "Rwanda"
+    ],
+    "North America": [
+        "Mexico",
+        "Hawai'I",
+        "Jamaica",
+        "Dominican Republic"
+    ]
+}
