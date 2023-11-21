@@ -1,3 +1,7 @@
 [type.csv]
 extend-glob = ["*.csv"]
 check-file = false
+
+[type.json]
+extend-glob = ["*.json"]
+check-file = false

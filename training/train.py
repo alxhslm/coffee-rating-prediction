@@ -5,6 +5,7 @@ import json
 import os
 import pickle
 import re
+import typing as t
 
 import numpy as np
 import pandas as pd
@@ -17,11 +18,17 @@ from sklearn.model_selection import KFold, train_test_split
 
 alpha = 1.0
 n_splits = 5
-output_file = 'model.bin'
-regions_file = "regions.json"
-flavours_file = "flavours.json"
+output_file = "model.bin"
 
 # data preparation
+with open("data/roasters.json", "r") as f:
+    ROASTERS: dict[str, t.Any] = json.load(f)
+
+with open("data/regions.json", "r") as f:
+    REGIONS: dict[str, list[str]] = json.load(f)
+
+with open("data/flavours.json", "r") as f:
+    FLAVOURS: dict[str, list[str]] = json.load(f)
 
 df = pd.read_csv(os.path.join("data/simplified_coffee.csv"))
 for col in ["name", "roaster", "roast", "loc_country", "origin", "review"]:
@@ -32,28 +39,21 @@ df = df.rename(columns={"loc_country": "roaster_country"})
 df["roast"] = df["roast"].fillna(df["roast"].mode().iloc[0])
 df["roaster_country"] = df["roaster_country"].str.replace("New Taiwan", "Taiwan")
 
+replace = {"’s": "'s", "é": "e", "’": "'"}  # noqa: RUF001
+for k, v in replace.items():
+    df["roaster"] = df["roaster"].str.replace(k, v)
 
-def _get_region_map(filename: str) -> dict[str, str]:
-    with open(os.path.join("data", filename), "r") as f:
-        REGIONS = json.load(f)
-    regions = {}
-    for r, countries in REGIONS.items():
+
+def _invert_region_map(regions: dict[str, list[str]]) -> dict[str, str]:
+    map = {}
+    for r, countries in regions.items():
         for c in countries:
-            regions[c] = r
-    return regions
+            map[c] = r
+    return map
 
 
-regions = _get_region_map(regions_file)
-df["region"] = df["origin"].map(regions).fillna("Other")
-
-roasters = df["roaster"].value_counts()
-ROASTERS = roasters[roasters > 10].index
-df["roaster"] = df["roaster"].where(df["roaster"].apply(lambda r: r in ROASTERS), "Other")
-
-
-def _get_flavour_map(filename: str) -> dict[str, list[str]]:
-    with open(os.path.join("data", filename), "r") as f:
-        return json.load(f)  # type:ignore
+df["region"] = df["origin"].map(_invert_region_map(REGIONS)).fillna("Other")
+df["roaster"] = df["roaster"].where(df["roaster"].apply(lambda r: r in ROASTERS["popular_roasters"]), "Other")
 
 
 def rating_contains_words(review: str, keywords: list[str]) -> bool:
@@ -67,14 +67,13 @@ def rating_contains_words(review: str, keywords: list[str]) -> bool:
     return False
 
 
-flavours = _get_flavour_map(flavours_file)
-for flavour, keywords in flavours.items():
+for flavour, keywords in FLAVOURS.items():
     df[flavour] = df["review"].apply(rating_contains_words, args=(keywords,))
 
 
 df_train_val, df_test = train_test_split(df, test_size=0.2, random_state=1)
 
-features = ["roaster", "roast", "roaster_country", "region", "100g_USD"] + list(flavours.keys())
+features = ["roaster", "roast", "roaster_country", "region", "100g_USD"] + list(FLAVOURS.keys())
 target = "rating"
 
 
