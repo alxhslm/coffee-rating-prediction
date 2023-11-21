@@ -35,3 +35,10 @@ Then run the following to test the server:
 ```
 python test_predict.py
 ```
+
+## Using the interactive dashboard
+You can generate predictions using an interactive `streamlit` dashboard. This can be launched locally by running the following command:
+
+```
+streamlit run dashboard.py
+```
