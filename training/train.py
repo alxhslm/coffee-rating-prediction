@@ -69,11 +69,12 @@ def rating_contains_words(review: str, keywords: list[str]) -> bool:
 
 for flavour, keywords in FLAVOURS.items():
     df[flavour] = df["review"].apply(rating_contains_words, args=(keywords,))
+df["flavours"] = df.apply(lambda coffee: [flavour for flavour in FLAVOURS if coffee[flavour]], axis=1)
 
 
 df_train_val, df_test = train_test_split(df, test_size=0.2, random_state=1)
 
-features = ["roaster", "roast", "roaster_country", "region_of_origin", "price_per_100g"] + list(FLAVOURS.keys())
+features = ["roaster", "roast", "roaster_country", "region_of_origin", "price_per_100g", "flavours"]
 target = "rating"
 
 
