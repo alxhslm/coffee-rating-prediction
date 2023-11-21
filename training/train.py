@@ -30,6 +30,7 @@ for col in ["name", "roaster", "roast", "loc_country", "origin", "review"]:
 df["review_date"] = pd.to_datetime(df["review_date"])
 df = df.rename(columns={"loc_country": "roaster_country"})
 df["roast"] = df["roast"].fillna(df["roast"].mode().iloc[0])
+df["roaster_country"] = df["roaster_country"].str.replace("New Taiwan", "Taiwan")
 
 
 def _get_region_map(filename: str) -> dict[str, str]:
