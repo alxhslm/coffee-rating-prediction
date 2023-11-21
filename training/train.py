@@ -35,7 +35,7 @@ for col in ["name", "roaster", "roast", "loc_country", "origin", "review"]:
     df[col] = df[col].astype("string")
 
 df["review_date"] = pd.to_datetime(df["review_date"])
-df = df.rename(columns={"loc_country": "roaster_country"})
+df = df.rename(columns={"loc_country": "roaster_country", "100g_USD": "price_per_100g", "origin": "country_of_origin"})
 df["roast"] = df["roast"].fillna(df["roast"].mode().iloc[0])
 df["roaster_country"] = df["roaster_country"].str.replace("New Taiwan", "Taiwan")
 
@@ -52,7 +52,7 @@ def _invert_region_map(regions: dict[str, list[str]]) -> dict[str, str]:
     return map
 
 
-df["region"] = df["origin"].map(_invert_region_map(REGIONS)).fillna("Other")
+df["region_of_origin"] = df["country_of_origin"].map(_invert_region_map(REGIONS)).fillna("Other")
 df["roaster"] = df["roaster"].where(df["roaster"].apply(lambda r: r in ROASTERS["popular_roasters"]), "Other")
 
 
@@ -73,7 +73,7 @@ for flavour, keywords in FLAVOURS.items():
 
 df_train_val, df_test = train_test_split(df, test_size=0.2, random_state=1)
 
-features = ["roaster", "roast", "roaster_country", "region", "100g_USD"] + list(FLAVOURS.keys())
+features = ["roaster", "roast", "roaster_country", "region_of_origin", "price_per_100g"] + list(FLAVOURS.keys())
 target = "rating"
 
 

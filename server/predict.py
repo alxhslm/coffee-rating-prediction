@@ -1,6 +1,7 @@
 import os
 import pickle
 import typing as t
+from dataclasses import asdict, dataclass
 
 import numpy as np
 from flask import Flask, Response, jsonify, request
@@ -16,8 +17,18 @@ def _load_model(filename: str) -> tuple[DictVectorizer, Ridge]:
 DV, MODEL = _load_model(os.path.join(os.path.dirname(__file__), "model.bin"))
 
 
-def _predict(coffee: dict[str, t.Any]) -> float:
-    X = DV.transform([coffee])
+@dataclass
+class CoffeeInput:
+    roaster: str
+    roast: t.Literal["Light", "Medium-Light", "Medium", "Medium-Dark", "Dark"]
+    roaster_country: str
+    region_of_origin: str
+    price_per_100g: float
+    flavours: list[str]
+
+
+def _predict(coffee: CoffeeInput) -> float:
+    X = DV.transform([asdict(coffee)])
     rating = np.expm1(MODEL.predict(X))[0]
     return float(rating)
 
@@ -27,7 +38,7 @@ app = Flask("app")
 
 @app.route('/predict', methods=['POST'])
 def predict() -> Response:
-    coffee = request.get_json()
+    coffee = CoffeeInput(**request.get_json())
     result = {'rating': _predict(coffee)}
     return jsonify(result)  ## send back the data in json format to the user
 
