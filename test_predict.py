@@ -1,7 +1,7 @@
 import requests
 
-hostname = "coffee_server"
-url = f"http://{hostname}:8501/predict"
+url = "https://f727bsqbr5pihm444pfa7p4zf40jzfah.lambda-url.eu-west-2.on.aws/"
+
 coffee = {
     "roaster": "Square Mile Coffee Roasters",
     "roast": "Light",

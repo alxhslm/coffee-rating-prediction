@@ -3,8 +3,6 @@ import json
 import requests
 import streamlit as st
 
-HOSTNAME = "coffee_server"
-
 ROAST_STYLES = ["Light", "Medium-Light", "Medium", "Medium-Dark", "Dark"]
 
 with open("data/roasters.json", "r") as f:
@@ -51,7 +49,8 @@ else:
 
 flavours = st.multiselect("Flavour profile", options=FLAVOURS, format_func=lambda s: s.capitalize())
 
-url = f"http://{HOSTNAME}:8501/predict"
+url = "https://f727bsqbr5pihm444pfa7p4zf40jzfah.lambda-url.eu-west-2.on.aws/"
+
 coffee = {
     "roaster": roaster,
     "roast": roast,
@@ -60,5 +59,7 @@ coffee = {
     "price_per_100g": price_per_100g,
     "flavours": flavours,
 }
-response = requests.post(url, json=coffee).json()
-st.metric("Predicted rating", value="{:.2f}%".format(response["rating"]))
+response = requests.post(url, json=coffee)
+response.raise_for_status()
+prediction = response.json()
+st.metric("Predicted rating", value="{:.2f}%".format(prediction["rating"]))
