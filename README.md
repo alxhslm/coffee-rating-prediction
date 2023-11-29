@@ -8,7 +8,7 @@ The dataset can be download from [Kaggle](https://www.kaggle.com/datasets/schmoy
 - Directly from the website
 - Using the Kaggle API as follows:
     ``` bash
-    !kaggle datasets download -d schmoyote/coffee-reviews-dataset -f simplified_coffee.csv -p training
+    !kaggle datasets download -d schmoyote/coffee-reviews-dataset -f simplified_coffee.csv -p data
     ```
 ## Training the model
 To train a linear regression model, run the following script:
