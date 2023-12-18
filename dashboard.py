@@ -32,6 +32,7 @@ def _get_default_country(roaster: str) -> str:
     return country
 
 
+st.set_page_config("Coffee rating predictor", page_icon="coffee")
 st.title(":coffee: Coffee rating predictor")
 st.markdown(
     "This is an ML-powered app for prediciting how highly rated a coffee would be on "
