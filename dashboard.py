@@ -17,7 +17,8 @@ with open("data/roasters.json", "r") as f:
 
 
 with open("data/regions.json", "r") as f:
-    REGIONS: list[str] = list(json.load(f).keys())
+    REGIONS: dict[str, list[str]] = json.load(f)
+    REGIONS["Other"] = []
 
 
 with open("data/flavours.json", "r") as f:
@@ -37,6 +38,7 @@ st.markdown(
     "You can find out more about how it works [here](https://alxhslm.github.io/projects/coffee-rating-prediction/)."
 )
 
+st.subheader("🔥 Roaster")
 roaster: str = st.selectbox("Roaster", options=list(ROASTERS.keys()) + ["Other"])  # type:ignore
 known_countries = sorted({v for v in ROASTERS.values()}) + ["Other"]
 roaster_country = st.selectbox(
@@ -44,8 +46,12 @@ roaster_country = st.selectbox(
 )
 roast = st.selectbox("Roast style", options=ROAST_STYLES)
 
-origin = st.selectbox("Region of origin", options=REGIONS + ["Other"])
+st.subheader("🌍 Origin")
 
+region_of_origin: str = st.selectbox("Region of origin", options=list(REGIONS.keys()))  # type: ignore
+country_of_origin = st.selectbox("Country of origin", options=REGIONS[region_of_origin] + ["Other"])
+
+st.subheader("💵 Price")
 price_mode = st.radio("Select price", options=["Price per bag", "Price per 100g"], horizontal=True)
 if price_mode == "Price per bag":
     col1, col2 = st.columns(2)
@@ -72,11 +78,18 @@ coffee = {
     "roaster": roaster,
     "roast": roast,
     "roaster_country": roaster_country,
-    "region_of_origin": origin,
+    "country_of_origin": country_of_origin,
     "price_per_100g": price_per_100g,
     "flavours": flavours,
 }
 response = requests.post(url, json=coffee, auth=auth)
 response.raise_for_status()
 prediction = response.json()
-st.metric("Predicted rating", value="{:.2f}%".format(prediction["rating"]))
+
+st.divider()
+st.subheader("🏆 Prediction")
+col1, col2 = st.columns(2)
+with col1:
+    st.metric("Rating", value="{:.2f}%".format(prediction["rating"]))
+with col2:
+    st.metric("Percentile", value="{:.2f}%".format(prediction["percentile"]))
