@@ -16,16 +16,13 @@ from sklearn.model_selection import KFold, train_test_split
 
 # parameters
 
-alpha = 1.0
+alpha = 10.0
 n_splits = 5
 output_file = "model.bin"
 
 # data preparation
 with open("data/roasters.json", "r") as f:
     ROASTERS: dict[str, t.Any] = json.load(f)
-
-with open("data/regions.json", "r") as f:
-    REGIONS: dict[str, list[str]] = json.load(f)
 
 with open("data/flavours.json", "r") as f:
     FLAVOURS: dict[str, list[str]] = json.load(f)
@@ -44,15 +41,6 @@ for k, v in replace.items():
     df["roaster"] = df["roaster"].str.replace(k, v)
 
 
-def _invert_region_map(regions: dict[str, list[str]]) -> dict[str, str]:
-    map = {}
-    for r, countries in regions.items():
-        for c in countries:
-            map[c] = r
-    return map
-
-
-df["region_of_origin"] = df["country_of_origin"].map(_invert_region_map(REGIONS)).fillna("Other")
 df["roaster"] = df["roaster"].where(df["roaster"].apply(lambda r: r in ROASTERS["popular_roasters"]), "Other")
 
 
@@ -74,17 +62,25 @@ df["flavours"] = df.apply(lambda coffee: [flavour for flavour in FLAVOURS if cof
 
 df_train_val, df_test = train_test_split(df, test_size=0.2, random_state=1)
 
-features = ["roaster", "roast", "roaster_country", "region_of_origin", "price_per_100g", "flavours"]
+features = ["roaster", "roast", "roaster_country", "country_of_origin", "price_per_100g", "flavours"]
+flavours = ["fruity", "resinous", "spicy", "nutty"]
 target = "rating"
 
 
+def _preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
+    X = X.copy()
+    X["price_per_100g"] = X["price_per_100g"].apply(np.log1p)
+    X["flavours"] = df["flavours"].apply(lambda x: [flavour for flavour in x if flavour in flavours])
+    return X
+
+
 # training
-def train(X: pd.DataFrame, y: pd.Series, alpha: float) -> tuple[DictVectorizer, Ridge]:
+def train(df: pd.DataFrame, y: pd.Series, alpha: float) -> tuple[DictVectorizer, Ridge]:
+    X = _preprocess_features(df)
     dicts = X.to_dict(orient='records')
 
     dv = DictVectorizer(sparse=False)
     X = dv.fit_transform(dicts)
-    y = y.apply(np.log1p)
 
     model = Ridge(alpha=alpha)
     model.fit(X, y)
@@ -93,12 +89,13 @@ def train(X: pd.DataFrame, y: pd.Series, alpha: float) -> tuple[DictVectorizer, 
 
 
 def predict(df: pd.DataFrame, dv: DictVectorizer, model: Ridge) -> pd.Series:
+    X = _preprocess_features(df)
     dicts = df.to_dict(orient='records')
 
     X = dv.transform(dicts)
     y_pred = model.predict(X)
 
-    return pd.Series(np.expm1(y_pred), index=df.index, dtype=float, name=target)
+    return pd.Series(y_pred, index=df.index, dtype=float, name=target)
 
 
 # validation
@@ -124,7 +121,7 @@ print('alpha=%.3g %.3f +- %.3f' % (alpha, scores.mean(), scores.std()))
 
 
 # training the final model
-print('training the final model with alpha={alpha}')
+print(f'training the final model with alpha={alpha}')
 
 dv, model = train(df_train_val[features], df_train_val[target], alpha=alpha)
 y_pred = predict(df_test[features], dv, model)
