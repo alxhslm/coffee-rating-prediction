@@ -34,7 +34,8 @@ def _get_default_country(roaster: str) -> str:
 
 st.title(":coffee: Coffee rating predictor")
 st.markdown(
-    "This is an ML-powered app for prediciting the rating of a coffee based on the information you enter below. "
+    "This is an ML-powered app for prediciting how highly rated a coffee would be on "
+    "[CoffeeReview.com](https://www.coffeereview.com/) based on the information you enter below. "
     "You can find out more about how it works [here](https://alxhslm.github.io/projects/coffee-rating-prediction/)."
 )
 
