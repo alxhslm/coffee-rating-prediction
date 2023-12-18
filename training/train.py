@@ -98,6 +98,12 @@ def predict(df: pd.DataFrame, dv: DictVectorizer, model: Ridge) -> pd.Series:
     return pd.Series(y_pred, index=df.index, dtype=float, name=target)
 
 
+# save information about rating
+data = {
+    "mean": df["rating"].mean(),
+    "std": df["rating"].std(),
+}
+
 # validation
 print(f'doing validation with alpha={alpha}')
 
@@ -133,7 +139,7 @@ print(f'rmse={rmse}')
 # Save the model
 print(f'saving model to {output_file}')
 with open(os.path.join("server", output_file), 'wb') as f_out:
-    pickle.dump((dv, model), f_out)
+    pickle.dump((dv, model, data), f_out)
 
 
 print('training complete!')
