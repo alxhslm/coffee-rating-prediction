@@ -32,6 +32,10 @@ def _get_default_country(roaster: str) -> str:
 
 
 st.title(":coffee: Coffee rating predictor")
+st.markdown(
+    "This is an ML-powered app for prediciting the rating of a coffee based on the information you enter below. "
+    "You can find out more about how it works [here](https://alxhslm.github.io/projects/coffee-rating-prediction/)."
+)
 
 roaster: str = st.selectbox("Roaster", options=list(ROASTERS.keys()) + ["Other"])  # type:ignore
 known_countries = sorted({v for v in ROASTERS.values()}) + ["Other"]
