@@ -30,7 +30,7 @@
 			"editor.codeActionsOnSave": {
 				"source.fixAll": true,
 			},
-			"editor.defaultFormatter": "ms-python.black-formatter"
+			"editor.defaultFormatter": "charliermarsh.ruff"
 		},
 		"mypy-type-checker.args": [
 			"--cache-dir=/workspace/.vscode/.editor_mypy_cache"
@@ -45,7 +45,6 @@
 		"recommendations": [
 			"ms-python.python",
 			"ms-python.vscode-pylance",
-			"ms-python.black-formatter",
 			"ms-python.mypy-type-checker",
 			"ms-toolsai.jupyter",
 			"charliermarsh.ruff",

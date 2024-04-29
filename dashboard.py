@@ -69,8 +69,8 @@ else:
 flavours = st.multiselect("Flavour profile", options=FLAVOURS, format_func=lambda s: s.capitalize())
 
 auth = AWSRequestsAuth(
-    aws_access_key=os.environ['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+    aws_access_key=os.environ["AWS_ACCESS_KEY_ID"],
+    aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
     aws_host=host,
     aws_region="eu-west-2",
     aws_service="lambda",

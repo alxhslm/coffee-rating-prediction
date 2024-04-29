@@ -46,7 +46,7 @@ df["roaster"] = df["roaster"].where(df["roaster"].apply(lambda r: r in ROASTERS[
 
 def rating_contains_words(review: str, keywords: list[str]) -> bool:
     def _extract_words(string: str) -> list[str]:
-        return re.findall(r'\w+', string.lower())
+        return re.findall(r"\w+", string.lower())
 
     words = _extract_words(review)
     for w in keywords:
@@ -77,7 +77,7 @@ def _preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
 # training
 def train(df: pd.DataFrame, y: pd.Series, alpha: float) -> tuple[DictVectorizer, Ridge]:
     X = _preprocess_features(df)
-    dicts = X.to_dict(orient='records')
+    dicts = X.to_dict(orient="records")
 
     dv = DictVectorizer(sparse=False)
     X = dv.fit_transform(dicts)
@@ -90,7 +90,7 @@ def train(df: pd.DataFrame, y: pd.Series, alpha: float) -> tuple[DictVectorizer,
 
 def predict(df: pd.DataFrame, dv: DictVectorizer, model: Ridge) -> pd.Series:
     X = _preprocess_features(df)
-    dicts = df.to_dict(orient='records')
+    dicts = df.to_dict(orient="records")
 
     X = dv.transform(dicts)
     y_pred = model.predict(X)
@@ -105,7 +105,7 @@ data = {
 }
 
 # validation
-print(f'doing validation with alpha={alpha}')
+print(f"doing validation with alpha={alpha}")
 
 kfold = KFold(n_splits=n_splits, shuffle=True, random_state=1)
 
@@ -119,27 +119,27 @@ for fold, (train_idx, val_idx) in enumerate(kfold.split(df_train_val)):
 
     scores.loc[fold] = mean_squared_error(df_val[target], y_pred, squared=False)
 
-    print(f'rmse on fold {fold} is {scores[fold]}')
+    print(f"rmse on fold {fold} is {scores[fold]}")
 
 
-print('validation results:')
-print('alpha=%.3g %.3f +- %.3f' % (alpha, scores.mean(), scores.std()))
+print("validation results:")
+print("alpha=%.3g %.3f +- %.3f" % (alpha, scores.mean(), scores.std()))
 
 
 # training the final model
-print(f'training the final model with alpha={alpha}')
+print(f"training the final model with alpha={alpha}")
 
 dv, model = train(df_train_val[features], df_train_val[target], alpha=alpha)
 y_pred = predict(df_test[features], dv, model)
 rmse = mean_squared_error(df_test[target], y_pred, squared=False)
 
-print(f'rmse={rmse}')
+print(f"rmse={rmse}")
 
 
 # Save the model
-print(f'saving model to {output_file}')
-with open(os.path.join("server", output_file), 'wb') as f_out:
+print(f"saving model to {output_file}")
+with open(os.path.join("server", output_file), "wb") as f_out:
     pickle.dump((dv, model, data), f_out)
 
 
-print('training complete!')
+print("training complete!")
