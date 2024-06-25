@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.11
+FROM python:3.11-slim
 
 RUN pip install poetry==1.6.0
 
@@ -12,5 +12,7 @@ RUN poetry install
 
 # Copy any python files and the model we had to the working directory of Docker
 COPY ["predict.py", "model.bin", "./"]
+
+ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
 
 CMD [ "predict.lambda_handler" ]
